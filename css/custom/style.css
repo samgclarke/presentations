@@ -1,0 +1,14 @@
+.reveal h1, .reveal h2{
+	color: #a1d700;
+	margin-bottom: 100px;
+}
+.template {
+  
+}
+.template-left {
+	text-align: left;
+}
+.highlight {
+	color: orange;
+	font-weight: bold;
+}
