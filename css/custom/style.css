@@ -12,3 +12,7 @@
 	color: orange;
 	font-weight: bold;
 }
+
+.reveal section img.no-border {
+	border: none;
+}

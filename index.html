@@ -20,7 +20,7 @@
 		<!-- Code syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
     
-    <!-- custom css -->
+        <!-- custom css -->
 		<link rel="stylesheet" href="css/custom/style.css">
 
 		<!-- Printing and PDF exports -->
@@ -43,82 +43,103 @@
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
+			    <!-- Slide -->
 				<section>
-					<h1>Celery Tips and Tricks</h1>
-					<h3>Python Celery</h3>
-					<p>
-						<small>By Sam Clarke</small>
-					</p>
+					<h1>Demystifying Celery</h1>
+					<p><small>By Sam Clarke</small></p>
 				</section>
 
+				<!-- Slide -->
+				<section>
+					<h2>Template</h2>
+				</section>
+
+				<!-- Slide -->
+				<section>
+					<h2>Who I am</h2>
+					<ul>
+					  <li>Technical Director @ Rival Schools</li>
+					  <li>Lead Developer @ Script Speaker</li>
+					</ul>
+				</section>
+
+				<!-- Slide -->
+				<section>
+					<h2>Who I am <strong>NOT</strong></h2>
+					<ul>
+					  <li>Not a core dev of Celery</li>
+					  <li>Not an expert</li>
+					</ul>
+				</section>
+
+				<!-- Slide -->
+				<section>
+					<h2>Celery</h2>
+					<img class="no-border" src="img/celery.png" />
+				</section>
+
+                <!-- Slide -->
 				<section>
 					<h1>What is Celery?</h1>
-					<div class="template">
-						<p>
-							Celery is written in Python.
-						</p>
-						<p>
-							Celery is a task queue.
-						</p>
-					</div>
+					<ul>
+						<li>Celery is written in Python.</li>
+						<li>Celery is a task queue.</li>
+					</ul>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>Why do I need Celery?</h2>
 					<div class="template template-left">
 					  <ul>
-						  <li>
-							  Maybe you Don't (your app is syncronous).
-						  </li>
-						  <li>
-							  You have task which don't need to be executed syncronously.
-						  </li>
-						  <li>
-						    You are configuring your application for performance where available resources are a concern.
-						  </li>
+						  <li>Maybe you Don't (your app is syncronous).</li>
+						  <li>You have task which don't need to be executed syncronously.</li>
+						  <li>You are configuring your application for performance where available resources are a concern.</li>
 					  </ul>
 					</div>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>How Does Celery work?</h2>
 					<div class="template template-left">
-					  <p>
-					    Celery communicates via messages, usually using a <span class="highlight">Broker</span> to mediate between clients and workers.
-					  </p>
-					  <p>
-              Common transport brokers include RabbitMQ, Redis, SQL.
-					  </p>
+					  <p>Celery communicates via messages, usually using a <span class="highlight">Broker</span> to mediate between clients and workers.</p>
+					  <p>Common transport brokers include RabbitMQ, Redis, SQL.</p>
 					</div>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>Registering Tasks</h2>
 					<section data-markdown>
+				    <!-- code -->
 				    <script type="text/template">
-            
-            @task()
-            def send_confirmation_email(user_id):
-                user = User.objects.get(id=user_id)
-                subject = 'Welcome, {}'.format(user.username)
-                subject = '<h1>Welcome, {}</h1>'.format(user.username)
-                send_email(user.email, subject, html)
+			            @task()
+			            def send_confirmation_email(user_id):
+			                user = User.objects.get(id=user_id)
+			                subject = 'Welcome, {}'.format(user.username)
+			                subject = '<h1>Welcome, {}</h1>'.format(user.username)
+			                send_email(user.email, subject, html)
 				    </script>
 					</section>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>Workers & Concurrency</h2>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>Chaining Tasks</h2>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>Celery Flower</h2>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>Tips</h2>
 					<div class="template template-left">
@@ -139,6 +160,7 @@
 					</div>
 				</section>
 
+                <!-- Slide -->
 				<section>
 					<h2>References</h2>
 					<ul>
