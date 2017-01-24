@@ -1,206 +1,377 @@
 <!doctype html>
 <html lang="en">
 
-	<head>
-		<meta charset="utf-8">
+    <head>
+        <meta charset="utf-8">
 
-		<title>Celery Tips and Tricks - Sam Clarke</title>
+        <title>Celery Tips and Tricks - Sam Clarke</title>
 
-		<meta name="description" content="A framework for easily creating beautiful presentations using HTML">
-		<meta name="author" content="Hakim El Hattab">
+        <meta name="description" content="A framework for easily creating beautiful presentations using HTML">
+        <meta name="author" content="Hakim El Hattab">
 
-		<meta name="apple-mobile-web-app-capable" content="yes">
-		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+        <meta name="apple-mobile-web-app-capable" content="yes">
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
 
-		<link rel="stylesheet" href="css/reveal.css">
-		<link rel="stylesheet" href="css/theme/black.css" id="theme">
+        <link rel="stylesheet" href="css/reveal.css">
+        <link rel="stylesheet" href="css/theme/black.css" id="theme">
 
-		<!-- Code syntax highlighting -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+        <!-- Code syntax highlighting -->
+        <link rel="stylesheet" href="lib/css/zenburn.css">
     
         <!-- custom css -->
-		<link rel="stylesheet" href="css/custom/style.css">
+        <link rel="stylesheet" href="css/custom/style.css">
 
-		<!-- Printing and PDF exports -->
-		<script>
-			var link = document.createElement( 'link' );
-			link.rel = 'stylesheet';
-			link.type = 'text/css';
-			link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
-			document.getElementsByTagName( 'head' )[0].appendChild( link );
-		</script>
+        <!-- Printing and PDF exports -->
+        <script>
+            var link = document.createElement( 'link' );
+            link.rel = 'stylesheet';
+            link.type = 'text/css';
+            link.href = window.location.search.match( /print-pdf/gi ) ? 'css/print/pdf.css' : 'css/print/paper.css';
+            document.getElementsByTagName( 'head' )[0].appendChild( link );
+        </script>
 
-		<!--[if lt IE 9]>
-		<script src="lib/js/html5shiv.js"></script>
-		<![endif]-->
-	</head>
+        <!--[if lt IE 9]>
+        <script src="lib/js/html5shiv.js"></script>
+        <![endif]-->
+    </head>
 
-	<body>
+    <body>
 
-		<div class="reveal">
+        <div class="reveal">
 
-			<!-- Any section element inside of this container is displayed as a slide -->
-			<div class="slides">
-			    <!-- Slide -->
-				<section>
-					<h1>Demystifying Celery</h1>
-					<p><small>By Sam Clarke</small></p>
-				</section>
-
-				<!-- Slide -->
-				<section>
-					<h2>Template</h2>
-				</section>
-
-				<!-- Slide -->
-				<section>
-					<h2>Who I am</h2>
-					<ul>
-					  <li>Technical Director @ Rival Schools</li>
-					  <li>Lead Developer @ Script Speaker</li>
-					</ul>
-				</section>
-
-				<!-- Slide -->
-				<section>
-					<h2>Who I am <strong>NOT</strong></h2>
-					<ul>
-					  <li>Not a core dev of Celery</li>
-					  <li>Not an expert</li>
-					</ul>
-				</section>
-
-				<!-- Slide -->
-				<section>
-					<h2>Celery</h2>
-					<img class="no-border" src="img/celery.png" />
-				</section>
+            <!-- Any section element inside of this container is displayed as a slide -->
+            <div class="slides">
+                <!-- Slide -->
+                <section>
+                    <h1>Demystifying Celery</h1>
+                    <p><small>Sam Clarke</small></p>
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h1>What is Celery?</h1>
-					<ul>
-						<li>Celery is written in Python.</li>
-						<li>Celery is a task queue.</li>
-					</ul>
-				</section>
+                <section>
+                    <h1>Template</h1>
+                </section>
+
+
+                <!--  ////////////////////////  INTRODUCTION  /////////////////////// -->
+                <!-- Slide -->
+                <section>
+                    <h1>Who I am</h1>
+                    <ul>
+                      <li>Technical Director @ <strong><span class="highlight">Rival Schools</span></strong></li>
+                      <li>Lead Developer &nbsp;&nbsp;&nbsp; @ <strong><span class="highlight">Script Speaker</span></strong></li>
+                    </ul>
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>Why do I need Celery?</h2>
-					<div class="template template-left">
-					  <ul>
-						  <li>Maybe you Don't (your app is syncronous).</li>
-						  <li>You have task which don't need to be executed syncronously.</li>
-						  <li>You are configuring your application for performance where available resources are a concern.</li>
-					  </ul>
-					</div>
-				</section>
+                <section>
+                    <h1>Who I am <strong>NOT</strong></h1>
+                    <ul>
+                      <li>Not a core dev of Celery</li>
+                      <li>Not an expert</li>
+                    </ul>
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>How Does Celery work?</h2>
-					<div class="template template-left">
-					  <p>Celery communicates via messages, usually using a <span class="highlight">Broker</span> to mediate between clients and workers.</p>
-					  <p>Common transport brokers include RabbitMQ, Redis, SQL.</p>
-					</div>
-				</section>
+                <section>
+                    <h1>Celery</h1>
+                    <!-- TODO: image fo celery stick transversely showing C shape.
+                    joke: Core Devs missed an opportunity here for the logo...-->
+                    <img class="no-border" src="" />
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>Registering Tasks</h2>
-					<section data-markdown>
-				    <!-- code -->
-				    <script type="text/template">
-			            @task()
-			            def send_confirmation_email(user_id):
-			                user = User.objects.get(id=user_id)
-			                subject = 'Welcome, {}'.format(user.username)
-			                subject = '<h1>Welcome, {}</h1>'.format(user.username)
-			                send_email(user.email, subject, html)
-				    </script>
-					</section>
-				</section>
+                <section>
+                    <h1>Celery</h1>
+                    <img class="no-border" src="img/celery.png" />
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>Workers & Concurrency</h2>
-				</section>
+                <section>
+                    <h1>Why this talk?</h1>
+                    <img />
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>Chaining Tasks</h2>
-				</section>
+                <section>
+                    <h1>What is Celery?</h1>
+                    <ul>
+                        <li>Celery is written in Python.</li>
+                        <li>Celery is a task queue.</li>
+                        <li><span class="highlight">Django-Celery</span> is also a thing.</li>
+                    </ul>
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>Celery Flower</h2>
-				</section>
+                <section>
+                    <h1>Do I need Celery?</h1>
+                    <div class="template template-left">
+                      <ul>
+                          <li>Maybe you don't (your app is syncronous).</li>
+                          <li>You have tasks which don't need to be executed <span class="highlight">syncronously</span>.</li>
+                          <li>You are configuring your application for <span class="highlight">performance</span> where available resources are a concern.</li>
+                      </ul>
+                    </div>
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>Tips</h2>
-					<div class="template template-left">
-					  <ul>
-							<li>
-		            Restart Celery deamon when the task code changes. 
-							</li>
-							<li>
-		            Don't send objects to tasks. State can change.
-							</li>
-							<li>
-		            Many small tasks are better than one large one.
-							</li>
-							<li>
-		            Don't block. If you need to wait for the result it's not asychronous.
-							</li>
-						</ul>
-					</div>
-				</section>
+                <section>
+                    <h1>Do I need Celery?</h1>
+                    <p>Introducing Celery into your application is trade-off bewtween <span class="highlight">performance</span> and <span class="highlight">complexity</span>.</p>
+                </section>
 
                 <!-- Slide -->
-				<section>
-					<h2>References</h2>
-					<ul>
-					  <li><a href="http://programeveryday.com/post/message-queues-python-and-celery/">http://programeveryday.com/post/message-queues-python-and-celery</a></li>
-					  <li><a href="https://denibertovic.com/posts/celery-best-practices/">https://denibertovic.com/posts/celery-best-practices/</a></li>
-					</li>
-				</section>
+                <section>
+                    <div class="template template-left">
+                      <p>Celery is one of my go-to tools for any web app.</p> 
+                      <p>Even apps of modest size can benefit from a task queue.</p>
+                    </div>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>How Does Celery work?</h1>
+                </section>
+
+                <section>
+                    <div class="template template-left">
+                      <p>Celery communicates via messages, usually using a <span class="highlight">broker</span> to mediate between clients and workers.</p>
+                      <p>Common transport brokers are <span class="highlight">RabbitMQ, Redis</span>.</p>
+                    </div>
+                </section>
+
+                <section>
+                    <div class="template template-left">
+                      <p>Celery can store task state (optional) using a result <span class="highlight">backend</span>.</p>
+                      <p>Common result backends include <span class="highlight">RabbitMQ, Redis, MemcacheD, SQL</span>.</p>
+                    </div>
+                </section>
+                
+
+                <!--  ////////////////////////  SETTING UP CELERY  /////////////////////// -->
+
+                <!-- Slide -->
+                <section>
+                    <h1>Setting Up Celery</h1>
+                </section>
+                
+                <!-- Slide -->
+                <section>
+                    <ul>
+                      <li>sudo <span class="highlight">apt-get</span> install rabbitmq-server</li>
+                      <li><span class="highlight">pip</span> install celery</li>
+                    </ul>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Starting Celery</h1>
+                    <p style='font-size: 28px'>celery worker --app <span class="highlight">app.celery</span> --concurrency 4 --loglevel=debug</p>
+                </section>
+                
+                <!-- Slide -->
+                <section>
+                    <h1>Registering Tasks</h1>
+                </section>
+
+                 <!-- Slide -->
+                <section>
+                    <h1>Regular Function</h1>
+                    <!-- code -->
+                    <pre><code data-trim>
+def send_email(user_id):
+    user = User.objects.get(id=user_id)
+    subject = 'Welcome, {}'.format(user.username)
+    body = 'Hello from Celery'
+    send_email(user.email, subject, body)
+
+#  call task synchronously
+send_email(user_id=1234)
+                        </code></pre>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Celery Function</h1>
+                    <!-- code -->
+                    <pre><code data-trim>
+@celery.task
+def send_email(user_id):
+    user = User.objects.get(id=user_id)
+    subject = 'Welcome, {}'.format(user.username)
+    body = 'Hello from Celery'
+    send_email(user.email, subject, body)
+
+#  call task asynchronously
+send_email.delay(user_id=1234)
+                        </code></pre>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Getting Results</h1>
+                    <!-- code -->
+                    <pre><code data-trim>
+@celery.task
+def add(x, y):
+    retun x + y
+
+#  This is not what you may expect...
+result = add.delay(5, 7)
+                    </code></pre>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Getting Results</h1>
+                    <!-- code -->
+                    <pre><code data-trim>
+@celery.task
+def add(x, y):
+    retun x + y
+
+#  We first get a reference to the task
+task = add.delay(5, 7)
+
+#  We don't know when our task will be ready
+while not task.ready():
+    time.sleep(1)
+
+#  Now we can get our actual result
+result = task.get()
+                    </code></pre>
+                </section>
+                
+                <!-- slide -->
+                <section>
+                    <h1>Don't rely on state</h1>
+                    <!-- code -->
+                    <pre><code data-trim>
+@celery.task
+def send_email(user_id):
+    user = User.objects.get(id=user_id)
+    ...
+    send_email(user.email, subject, body)
+
+#  why not just pass in the user object?
+send_email.delay(user_id=1234)
+
+                        </code></pre>
+                </section>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Chaining Tasks</h1>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Workers & Concurrency</h1>
+                </section>
+
+                <!--  ////////////////////////  MONITORING AND TESTING  /////////////////////// -->
+                <!-- Slide -->
+                <section>
+                    <h1>Celery Flower</h1>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Celery Flower</h1>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Munin</h1>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Getting Task Status</h1>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Setting Task Priority</h1>
+                    <p>"RabbitMQ supports priorities since version 3.5.0, and the Redis transport emulates priority support."</p>
+                    <p>In Production, best to route high-priority tasks to dedicated workers.</p>
+                </section>
+
+                <!-- Slide -->
+                <section>
+                    <h1>Distributing Workers across hosts</h1>
+                    <ul>
+                      <li>Add hosts address. TODO: clarify this.</li>
+                      <li>Each host must have access to the task code locally.</li>
+                    </ul>
+                </section>
 
 
-			</div>
+                <!-- Slide -->
+                <section>
+                    <h1>Tips</h1>
+                    <div class="template template-left">
+                      <ul>
+                            <li>
+                    Restart Celery deamon when the task code changes. 
+                            </li>
+                            <li>
+                    Don't send objects to tasks. State can change.
+                            </li>
+                            <li>
+                    Many small tasks are better than one large one.
+                            </li>
+                            <li>
+                    Don't block. If you need to wait for the result it's not asychronous.
+                            </li>
+                        </ul>
+                    </div>
+                </section>
 
-		</div>
+                <!-- Slide -->
+                <section>
+                    <h1>References</h1>
+                    <ul>
+                      <li><a href="http://programeveryday.com/post/message-queues-python-and-celery/">http://programeveryday.com/post/message-queues-python-and-celery</a></li>
+                      <li><a href="https://denibertovic.com/posts/celery-best-practices/">https://denibertovic.com/posts/celery-best-practices/</a></li>
+                    </li>
+                </section>
 
-		<script src="lib/js/head.min.js"></script>
-		<script src="js/reveal.js"></script>
 
-		<script>
+            </div>
 
-			// Full list of configuration options available at:
-			// https://github.com/hakimel/reveal.js#configuration
-			Reveal.initialize({
-				controls: true,
-				progress: true,
-				history: true,
-				center: true,
+        </div>
 
-				transition: 'slide', // none/fade/slide/convex/concave/zoom
+        <script src="lib/js/head.min.js"></script>
+        <script src="js/reveal.js"></script>
 
-				// Optional reveal.js plugins
-				dependencies: [
-					{ src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
-					{ src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
-					{ src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
-					{ src: 'plugin/zoom-js/zoom.js', async: true },
-					{ src: 'plugin/notes/notes.js', async: true }
-				]
-			});
+        <script>
 
-		</script>
+            // Full list of configuration options available at:
+            // https://github.com/hakimel/reveal.js#configuration
+            Reveal.initialize({
+                controls: true,
+                progress: true,
+                history: true,
+                center: true,
 
-	</body>
+                transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+                // Optional reveal.js plugins
+                dependencies: [
+                    { src: 'lib/js/classList.js', condition: function() { return !document.body.classList; } },
+                    { src: 'plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+                    { src: 'plugin/highlight/highlight.js', async: true, callback: function() { hljs.initHighlightingOnLoad(); } },
+                    { src: 'plugin/zoom-js/zoom.js', async: true },
+                    { src: 'plugin/notes/notes.js', async: true }
+                ]
+            });
+
+        </script>
+
+    </body>
 </html>

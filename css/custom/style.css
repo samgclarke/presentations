@@ -1,3 +1,15 @@
+@import url('https://fonts.googleapis.com/css?family=Averia+Sans+Libre');
+@import url('https://fonts.googleapis.com/css?family=Raleway');
+
+.reveal h1, .reveal h2 {
+	font-family: 'Averia Sans Libre', serif !important;
+	font-weight: normal;
+}
+.reveal p, .reveal li {
+	font-family: 'Raleway', serif !important;
+}
+
+
 .reveal h1, .reveal h2{
 	color: #a1d700;
 	margin-bottom: 100px;
