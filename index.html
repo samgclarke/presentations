@@ -84,7 +84,6 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
-<h1>Celery</h1>
 <img class="no-border" src="img/celery.png" />
 </section>
 
@@ -94,7 +93,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <ul>
   <li>New things are <span class="highlight">hard</span></li>
   <li>Distributed what?</li>
-  <li>It's not all Python</li>
+  <li>It's not just Python?</li>
 </ul>
 </section>
 
@@ -129,8 +128,8 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <!-- Slide -->
 <section>
 <div class="template template-left">
-<p>Celery is one of my go-to tools for any web app.</p> 
-<p>Even apps of modest size can benefit from a task queue.</p>
+<span class="highlight"><p>Celery is one of my go-to tools for any web app.</p> 
+<p>Even apps of modest size can benefit from a task queue.</p></span>
 </div>
 </section>
 
@@ -140,16 +139,22 @@ joke: Core Devs missed an opportunity here for the logo...-->
 </section>
 
 <section>
+<h2>Celery Brokers</h2>
 <div class="template template-left">
-<p>Celery communicates via messages, usually using a <span class="highlight">broker</span> to mediate between clients and workers.</p>
-<p>Common transport brokers are <span class="highlight">RabbitMQ, Redis</span>.</p>
+<ul>
+<li>Celery communicates via <span class="highlight">messages</span>, usually using a <span class="highlight">broker</span> to mediate between clients and workers.</li>
+<li>Common brokers are <span class="highlight">RabbitMQ, Redis</span>.</li>
+</ul>
 </div>
 </section>
 
 <section>
+<h2>Celery Backends</h2>
 <div class="template template-left">
-<p>Celery can store task state (optional) using a result <span class="highlight">backend</span>.</p>
-<p>Common result backends include <span class="highlight">RabbitMQ, Redis, MemcacheD, SQL</span>.</p>
+<ul>
+<li>Celery can store task state (optional) using a result <span class="highlight">backend</span>.</li>
+<li>Common result backends include <span class="highlight">RabbitMQ, Redis, MemcacheD, SQL</span>.</li>
+</ul>
 </div>
 </section>
 
@@ -164,7 +169,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <section>
 <h2>Install system packages</h2>
 <ul>
-  <li>sudo <span class="highlight">apt-get</span> install rabbitmq-server</li>
+  <li>sudo <span class="highlight">apt-get</span> install rabbitmq-server (redis)</li>
   <li><span class="highlight">pip</span> install celery</li>
 </ul>
 </section>
@@ -344,21 +349,55 @@ def send_email(user_id):
 
 
 #  why not just pass in the user object?
+
 send_email.delay(user_id=1234)
 
 </code></pre>
 </section>
 
+<!-- slide -->
+<section>
+<h2>Useful Task methods</h2>
+<ul>
+  <li><span class="highlight">task.get()</span> - blocks until ready. Returns result or Exception.</li>
+  <li><span class="highlight">task.successful()</span> - returns True or False</li>
+  <li><span class="highlight">task.ready()</span> - returns True if task is done.</li>
+  <li><span class="highlight">task.revoke()</span> - workers will ignore task. If terminate=True, execution is killed.
+</ul>
+</section>
+
 <!-- Slide -->
 <section>
-<h1>Chaining Tasks</h1>
+<h2>Chaining Tasks</h2>
+<p class="template template-left">A <span class="highlight">signature()</span> wraps the arguments, keyword arguments, and execution options of a single task invocation in a way such that it can be passed to functions.</p>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Chaining Tasks</h2>
+<p><span class="highlight">s()</span> is a shortcut for <span class="highlight">signature()</span>, using star arguments.</p>
+<!-- code -->
+<pre><code data-trim>
+#  the second task takes result of first task and 10 as args
+
+tasks = chain(add.s(5, 7), add.s(10)).delay()
+
+
+
+#  use ids to obtain each task object
+#  you probably want to check task status
+#  before calling task.result
+
+result_one = add.AsyncResult(tasks.parent.id).result
+result_two = add.AsyncResult(tasks.id).result
+</code></pre>
 </section>
 
 <!-- Slide -->
 <section>
 <h1>Task Priority</h1>
-<p  class="template template-left  highlight">"RabbitMQ supports priorities since version 3.5.0, and the Redis transport emulates priority support."</p>
-<p  class="template template-left">In Production, it is best to route high-priority tasks to dedicated workers.</p>
+<p class="template template-left highlight">"RabbitMQ supports priorities since version 3.5.0, and the Redis transport emulates priority support."</p>
+<p class="template template-left">In Production, it is best to route high-priority tasks to dedicated workers.</p>
 </section>
 
 
@@ -367,8 +406,10 @@ send_email.delay(user_id=1234)
 <!-- Slide -->
 <section>
 <h1>Logging</h1>
-<p>Celery has its own logger wrapper.</p>
-<p>Your regular logs will get swallowed.</p>
+<ul>
+  <li>Celery has its own logger wrapper.</li>
+  <li>Your regular logs will get swallowed.</li>
+</ul>
 </section>
 
 <!-- slide -->
@@ -382,13 +423,15 @@ from celery.utils.log import get_task_logger
 </code></pre>
 
 <pre><code data-trim>
-#  NORMAL LOGGING IN FLASK
+#  normal logging in FLASK
+
 app = Flask(__name__)
 handler = logging.StreamHandler()
 app.logger.addHandler(handler)
 
 
-#  CELERY LOGGING
+#  CELERY logging
+
 celery_logger = get_task_logger(__name__)
 </code></pre>
 </section>
@@ -407,11 +450,12 @@ celery_logger = get_task_logger(__name__)
 <!-- Slide -->
 <section>
 <h1>Testing</h1>
+<p>You probably don't want to wait for your unit tests to execute.</p>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Testing</h2>
+<h2>Testing Options</h2>
 <ul>
   <li>Use Celery's <span class="highlight">ALWAYS_EAGER</span> mode.</li>
   <li>Use <span class="highlight">task.apply_async()</span> instead of <span class="highlight">task.delay()</span>.</li>
@@ -429,6 +473,11 @@ celery_logger = get_task_logger(__name__)
 </ul>
 </section>
 
+
+<!--  ////////////////////////  CELERY IN PRODUCTION  /////////////////////// -->
+<section>
+<h2>Daemonizing Celery</h2>
+</section>
 
 <!-- Slide -->
 <section>
