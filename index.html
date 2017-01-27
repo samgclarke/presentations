@@ -321,8 +321,8 @@ task = add.delay(5, 7)
 #  get task object by id
 task = add.AsyncResult(task.id)
 
-#  return result if task is finished
 if task.ready():
+    #  returns result or Exception
     result = task.get()
     ...
 else:
@@ -362,6 +362,22 @@ send_email.delay(user_id=1234)
 </section>
 
 
+<!--  ////////////////////////  SETTING UP IN PRODUCTION  /////////////////////// -->
+<!-- Slide -->
+<section>
+<h1>Celery in Production</h1>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Daemonizing Celery</h2>
+<ul>
+  <li>Upstart</li>
+  <li>SupervisorD</li>
+</ul>
+TODO: does Upstart know how to run itself as a daemon?
+Do all it's processes run as a child of Upstart?
+</section>
 
 <!--  ////////////////////////  MONITORING AND TESTING  /////////////////////// -->
 <!-- Slide -->
