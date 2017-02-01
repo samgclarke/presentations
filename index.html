@@ -395,8 +395,11 @@ result_two = add.AsyncResult(tasks.id).result
 
 <!-- slide -->
 <section>
+<h2>Custom States</h2>
 <!-- code -->
+<p>Sometimes you need more detailed state messages.</p>
 <pre><code data-trim>
+...
 current_status = self.get_status()
 task.update_state(
     state='PROGRESS',
@@ -412,6 +415,21 @@ task.update_state(
 <p class="template template-left">In Production, it is best to route high-priority tasks to dedicated workers.</p>
 </section>
 
+<!-- slide -->
+<section>
+<p>You can specify which queue a worker consumes using the <span class="highlight">-Q</span> option.</p>
+<pre><code data-trim>
+#  A high priority queue, with higher concurency
+
+python manage.py celery worker -Q high -c 10
+
+
+#  A Low priority queue, with lower concurency
+
+python manage.py celery worker -Q low -c 2
+</code></pre>
+</section>
+
 
 <!--  ////////////////////////  SETTING UP IN PRODUCTION  /////////////////////// -->
 <!-- Slide -->
@@ -422,6 +440,7 @@ task.update_state(
 <!-- Slide -->
 <section>
 <h2>Daemonizing Celery</h2>
+<p>You need to be able to run Celery workers in background and restart automoatically.</p>
 <ul>
   <li>Upstart</li>
   <li>SupervisorD</li>
@@ -502,10 +521,7 @@ celery_logger = get_task_logger(__name__)
 </section>
 
 
-<!--  ////////////////////////  CELERY IN PRODUCTION  /////////////////////// -->
-<section>
-<h2>Daemonizing Celery</h2>
-</section>
+<!--  ////////////////////////  CONCLUSION  /////////////////////// -->
 
 <!-- Slide -->
 <section>
