@@ -393,6 +393,18 @@ result_two = add.AsyncResult(tasks.id).result
 </code></pre>
 </section>
 
+<!-- slide -->
+<section>
+<!-- code -->
+<pre><code data-trim>
+current_status = self.get_status()
+task.update_state(
+    state='PROGRESS',
+    meta={'progress': current_status}
+)
+</code></pre>
+</section>
+
 <!-- Slide -->
 <section>
 <h1>Task Priority</h1>
