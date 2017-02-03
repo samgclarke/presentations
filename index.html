@@ -46,7 +46,7 @@
 <!-- Slide -->
 <section>
 <h1>Demystifying Celery</h1>
-<p><small>Sam Clarke</small></p>
+<p>Sam Clarke</p>
 </section>
 
 
@@ -86,9 +86,9 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <section>
 <h1>Why this talk?</h1>
 <ul>
-  <li>New things are <span class="highlight">hard</span></li>
-  <li>Distributed what?</li>
-  <li>It's not just Python?</li>
+  <li>New things are <span class="highlight">hard</span>.</li>
+  <li><span class="highlight">Distributed</span> what?</li>
+  <li>It's not just <span class="highlight">Python</span>?</li>
 </ul>
 </section>
 
@@ -137,7 +137,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <h2>Celery Brokers</h2>
 <div class="template template-left">
 <ul>
-<li>Celery communicates via <span class="highlight">messages</span>, usually using a <span class="highlight">broker</span> to mediate between clients and workers.</li>
+<li>Celery communicates via <span class="highlight">messages</span>, usually using a <span class="highlight">broker</span> to mediate between clients and <span class="highlight">workers</span>.</li>
 <li>Common brokers are <span class="highlight">RabbitMQ, Redis</span>.</li>
 </ul>
 </div>
@@ -352,6 +352,46 @@ send_email.delay(user_id=1234)
 
 <!-- slide -->
 <section>
+<h2>Custom States</h2>
+<!-- code -->
+<p>Sometimes you need more detailed state messages.</p>
+<pre><code data-trim>
+...
+current_status = self.get_status()
+task.update_state(
+    state='PROGRESS',
+    meta={'progress': current_status}
+)
+</code></pre>
+</section>
+
+<!-- slide -->
+<section>
+<h2>Data outside of Celery</h2>
+<p>This blog post: <span class="link">http://bit.ly/2eqd1DZ</span></p>
+<img class="no-border" src="img/caktus.png" />
+</section>
+
+<!-- slide -->
+<section>
+<h2>Data outside of Celery</h2>
+<p class="template template-left">Here we don't rely on Celery's task status to let us know whether the task completed successfully.</p>
+<pre><code>user.needs_welcome_email = True
+</code></pre>
+<pre><code>
+@celery.task
+def send_background_emails():
+  #  if task has not been run the Boolean value is True
+  for user in User.objects.filter_by(needs_welcome_email=True):
+      send_welcome_email(user.email)
+      user.needs_welcome_email = False
+      db.session.add(user)
+      db.session.commit()
+</code></pre>
+</section>
+
+<!-- slide -->
+<section>
 <h2>Useful Task methods</h2>
 <ul>
   <li><span class="highlight">task.get()</span> - blocks until ready. Returns result or Exception.</li>
@@ -385,21 +425,6 @@ tasks = chain(add.s(5, 7), add.s(10)).delay()
 
 result_one = add.AsyncResult(tasks.parent.id).result
 result_two = add.AsyncResult(tasks.id).result
-</code></pre>
-</section>
-
-<!-- slide -->
-<section>
-<h2>Custom States</h2>
-<!-- code -->
-<p>Sometimes you need more detailed state messages.</p>
-<pre><code data-trim>
-...
-current_status = self.get_status()
-task.update_state(
-    state='PROGRESS',
-    meta={'progress': current_status}
-)
 </code></pre>
 </section>
 
@@ -481,6 +506,19 @@ celery_logger = get_task_logger(__name__)
 <!-- Slide -->
 <section>
 <h1>Celery Flower</h1>
+<img class="no-border" src="img/flower.png" />
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Celery Flower</h2>
+<!-- code -->
+<pre><code data-trim>
+pip install flower
+</code></pre>
+<pre><code data-trim>
+celery flower -A app.celery --loglevel=info
+</code></pre>
 </section>
 
 <!-- Slide -->
@@ -492,7 +530,7 @@ celery_logger = get_task_logger(__name__)
 <!-- Slide -->
 <section>
 <h1>Testing</h1>
-<p>You probably don't want to wait for your unit tests to execute.</p>
+<p>You probably don't want to wait for your unit tests to execute <span class="highlight">asynchronously</span>.</p>
 </section>
 
 <!-- Slide -->
@@ -516,14 +554,23 @@ celery_logger = get_task_logger(__name__)
 </section>
 
 
+<!-- slide -->
+<section>
+<h2>Celery Alternatives</h2>
+<ul>
+<li><span class="highlight">Huey</span>. <span class="link">https://github.com/coleifer/huey</span></li>
+</ul>
+</section>
+
+
 <!--  ////////////////////////  CONCLUSION  /////////////////////// -->
 
 <!-- Slide -->
 <section>
-<h1>Conclusion</h1>
+<h1>Take Aways</h1>
 <div class="template template-left">
 <ul>
-<li>Don't send <span class="highlight">objects</span> to tasks. State can change.</li>
+<li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
 <li>Many <span class="highlight">small tasks</span> are better than one large one.
 </li>
 <li><span class="highlight">Don't block</span>. If you need to wait for the result it's not asychronous.</li>

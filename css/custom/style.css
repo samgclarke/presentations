@@ -25,6 +25,10 @@
 	color: orange;
 	font-weight: bold;
 }
+.link {
+	color: #3399ff;
+	text-decoration: underline;
+}
 
 .reveal section img.no-border {
 	border: none;
