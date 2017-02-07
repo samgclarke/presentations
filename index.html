@@ -123,8 +123,8 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <!-- Slide -->
 <section>
 <div class="template template-left">
-<span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p> 
-<p>Even apps of modest size can benefit from a task queue.</p></span>
+<span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p></span> 
+<p>Even apps of modest size can benefit from a task queue.</p>
 </div>
 </section>
 
@@ -148,9 +148,19 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <div class="template template-left">
 <ul>
 <li>Celery can store task state (optional) using a result <span class="highlight">backend</span>.</li>
-<li>Common result backends include <span class="highlight">RabbitMQ, Redis, MemcacheD, SQL</span>.</li>
+<li>Common result backends include <span class="highlight">RabbitMQ, Redis, MemcacheD, SQL, Elasticsearch</span>.</li>
 </ul>
 </div>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Workers & Concurrency</h2>
+<ul>
+  <li>A <span class="highlight">worker</span> is a Celery process.</li>
+  <li>By default <span class="highlight">multiprocessing</span> is used to perform concurrent execution of tasks.</li>
+  <li>The number of worker processes/threads can be changed using the <span class="highlight">--concurrency</span> argument and defaults to the number of CPUs.</li>
+</ul>
 </section>
 
 
@@ -167,11 +177,6 @@ joke: Core Devs missed an opportunity here for the logo...-->
   <li>sudo <span class="highlight">apt-get</span> install rabbitmq-server (redis)</li>
   <li><span class="highlight">pip</span> install celery</li>
 </ul>
-</section>
-
-<!-- Slide -->
-<section>
-<h1>Workers & Concurrency</h1>
 </section>
 
 <!-- Slide -->
@@ -250,6 +255,9 @@ send_email(user_id=1234)
 <h2>Celery Function</h2>
 <!-- code -->
 <pre><code data-trim>
+from app import celery
+
+
 @celery.task
 def send_email(user_id):
     user = User.objects.get(id=user_id)
@@ -279,6 +287,7 @@ send_email.delay(user_id=1234)
 <h2>Getting Results</h2>
 <!-- code -->
 <pre><code data-trim>
+#  This complex funtion returns a useful result
 @celery.task
 def add(x, y):
     return x + y
@@ -293,6 +302,7 @@ result = add.delay(5, 7)
 <h2>Getting Results</h2>
 <!-- code -->
 <pre><code data-trim>
+#  Our celery task
 @celery.task
 def add(x, y):
     return x + y
