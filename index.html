@@ -171,12 +171,6 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
-<h1>Starting Celery</h1>
-<p style='font-size: 28px'>celery worker --app <span class="highlight">app.celery</span> --concurrency 4 --loglevel=debug</p>
-</section>
-
-<!-- Slide -->
-<section>
 <h1>Workers & Concurrency</h1>
 </section>
 
@@ -190,12 +184,13 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <section>
 <h2>Instantiating Celery</h2>
 <!-- code -->
-<pre><code data-trim>
+<pre><code data-trim>rok
 #  app.py
 
 from celery import Celery
 
 celery = Celery(
+   'tasks',
     broker="amqp://guest@localhost//",
     backend="redis://localhost:6379/0"
 )
@@ -265,6 +260,18 @@ def send_email(user_id):
 #  call task asynchronously
 send_email.delay(user_id=1234)
 </code></pre>
+</section>
+
+<!-- Slide -->
+<section>
+<h1>Starting Celery</h1>
+<p style='font-size: 28px'>celery worker --app <span class="highlight">app.celery</span> --concurrency 4 --loglevel=debug</p>
+</section>
+
+<!-- Slide -->
+<section>
+<h1>Example Output</h1>
+<p>TODO</p>
 </section>
 
 <!-- Slide -->
