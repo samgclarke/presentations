@@ -53,6 +53,19 @@
 <!--  ////////////////////////  INTRODUCTION  /////////////////////// -->
 <!-- Slide -->
 <section>
+<h1>Celery</h1>
+<!-- TODO: image fo celery stick transversely showing C shape.
+joke: Core Devs missed an opportunity here for the logo...-->
+<img class="no-border" src="" />
+</section>
+
+<!-- Slide -->
+<section>
+<img class="no-border" src="img/celery.png" />
+</section>
+
+<!-- Slide -->
+<section>
 <h1>Who I am</h1>
 <ul>
   <li>Technical Director @ <strong><span class="highlight">Rival Schools</span></strong></li>
@@ -67,19 +80,6 @@
   <li>Not a core dev of Celery</li>
   <li>Not an expert</li>
 </ul>
-</section>
-
-<!-- Slide -->
-<section>
-<h1>Celery</h1>
-<!-- TODO: image fo celery stick transversely showing C shape.
-joke: Core Devs missed an opportunity here for the logo...-->
-<img class="no-border" src="" />
-</section>
-
-<!-- Slide -->
-<section>
-<img class="no-border" src="img/celery.png" />
 </section>
 
 <!-- Slide -->
@@ -117,13 +117,13 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <!-- Slide -->
 <section>
 <h1>Do I need Celery?</h1>
-<p>Introducing Celery into your application is trade-off bewtween <span class="highlight">performance</span> and <span class="highlight">complexity</span>.</p>
+<p>Introducing Celery into your application is trade-off between <span class="highlight">performance</span> and <span class="highlight">complexity</span>.</p>
 </section>
 
 <!-- Slide -->
 <section>
 <div class="template template-left">
-<span class="highlight"><p>Celery is one of my go-to tools for any web app.</p> 
+<span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p> 
 <p>Even apps of modest size can benefit from a task queue.</p></span>
 </div>
 </section>
@@ -281,7 +281,7 @@ send_email.delay(user_id=1234)
 <pre><code data-trim>
 @celery.task
 def add(x, y):
-    retun x + y
+    return x + y
 
 #  This is not what you may expect...
 result = add.delay(5, 7)
@@ -295,18 +295,18 @@ result = add.delay(5, 7)
 <pre><code data-trim>
 @celery.task
 def add(x, y):
-    retun x + y
+    return x + y
 
 #  We first get a reference to the task
-task = add.delay(5, 7)
+result = add.delay(5, 7)
 
 #  We don't know when our task will be ready...
 #  Note: this is blocking code - DON'T DO THIS!
-while not task.ready():
+while not result.ready():
     time.sleep(1)
 
 #  Now we can get our actual result
-result = task.get()
+result = result.get()
 </code></pre>
 </section>
 
@@ -479,7 +479,12 @@ Do all it's processes run as a child of Upstart?
 <!--  ////////////////////////  MONITORING AND TESTING  /////////////////////// -->
 <!-- Slide -->
 <section>
-<h1>Logging</h1>
+<h1>Monitoring And Testing</h1>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Logging</h2>
 <ul>
   <li>Celery has its own logger wrapper.</li>
   <li>Your regular logs will get swallowed.</li>
@@ -527,12 +532,6 @@ pip install flower
 celery flower -A app.celery --loglevel=info
 </code></pre>
 </section>
-
-<!-- Slide -->
-<section>
-<h1>Munin</h1>
-</section>
-
 
 <!-- Slide -->
 <section>
