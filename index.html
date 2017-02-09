@@ -122,6 +122,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
+<h1>Do I need Celery?</h1>
 <div class="template template-left">
 <span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p></span> 
 <p>Even apps of modest size can benefit from a task queue.</p>
@@ -147,7 +148,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <h2>Celery Backends</h2>
 <div class="template template-left">
 <ul>
-<li>Celery can store task state (optional) using a result <span class="highlight">backend</span>.</li>
+<li>Celery can store task state (optional) using a results <span class="highlight">backend</span>.</li>
 <li>Common result backends include <span class="highlight">RabbitMQ, Redis, MemcacheD, SQL, Elasticsearch</span>.</li>
 </ul>
 </div>
@@ -181,15 +182,9 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
-<h1>Instantiating Celery</h1>
-</section>
-
-
-<!-- Slide -->
-<section>
 <h2>Instantiating Celery</h2>
 <!-- code -->
-<pre><code data-trim>rok
+<pre><code data-trim>
 #  app.py
 
 from celery import Celery
@@ -199,6 +194,9 @@ celery = Celery(
     broker="amqp://guest@localhost//",
     backend="redis://localhost:6379/0"
 )
+
+#  Note: in production, use a deciated user/ vhost
+#  with appropriate permissions
 </code></pre>
 
 <p>or...</p>
@@ -223,7 +221,7 @@ celery.config_from_object('celery_config')
 import os
 
 BROKER_URL = os.environ['BROKER_URL']
-CELERY_RESULT_BACKEND = os.environ['BROKER_BACKEND']
+CELERY_RESULT_BACKEND = os.environ['BACKEND_URL']
 CELERYD_POOL_RESTARTS = True
 ...
 </code></pre>
@@ -270,16 +268,39 @@ send_email.delay(user_id=1234)
 </code></pre>
 </section>
 
-<!-- Slide -->
+<!-- slide -->
 <section>
-<h1>Starting Celery</h1>
-<p style='font-size: 28px'>celery worker --app <span class="highlight">app.celery</span> --concurrency 4 --loglevel=debug</p>
+<h2>Don't pass stateful objects</h2>
+<!-- code -->
+<pre><code data-trim>
+@celery.task
+def send_email(user_id):
+    user = User.objects.get(id=user_id)
+    subject = 'Welcome, {}'.format(user.username)
+    body = 'Hello from Celery'
+    send_email(user.email, subject, body)
+
+
+#  why not just pass in the user object?
+send_email.delay(user_id=1234)
+</code></pre>
 </section>
 
 <!-- Slide -->
 <section>
-<h1>Example Output</h1>
-<p>TODO</p>
+<h1>Starting Celery</h1>
+<p>celery worker <span class="highlight">--app</span> app.celery <span class="highlight">--concurrency</span> 4</p>
+<p></p>
+<ul>
+  <li><span class="highlight">app (-A)</span>: relative path to celery instance</li>
+  <li><span class="highlight">concurrency (-C)</span>: number of child process</li>
+</ul>
+</section>
+
+<!-- Slide -->
+<section>
+<div style="float:left; width: 30%; text-align: left;"><p>Example output from a Celery worker running locally.</p></div>
+<div style="float:left; width: 70%;"><img class="no-border" src="img/celery-terminal-stroke.png" /></div>
 </section>
 
 <!-- Slide -->
@@ -287,7 +308,7 @@ send_email.delay(user_id=1234)
 <h2>Getting Results</h2>
 <!-- code -->
 <pre><code data-trim>
-#  This complex funtion returns a useful result
+#  This complex function returns a useful result
 @celery.task
 def add(x, y):
     return x + y
@@ -300,70 +321,42 @@ result = add.delay(5, 7)
 <!-- Slide -->
 <section>
 <h2>Getting Results</h2>
-<!-- code -->
-<pre><code data-trim>
-#  Our celery task
-@celery.task
-def add(x, y):
-    return x + y
-
-#  We first get a reference to the task
-result = add.delay(5, 7)
-
-#  We don't know when our task will be ready...
-#  Note: this is blocking code - DON'T DO THIS!
-while not result.ready():
-    time.sleep(1)
-
-#  Now we can get our actual result
-result = result.get()
-</code></pre>
-</section>
-
-<!-- Slide -->
-<section>
-<h2>Getting Task Status</h2>
 <pre><code data-trim>
 from celery import Celery
 from celery.result import AsyncResult
 
 @celery.task
 def add(x, y):
-    retun x + y
+    return x + y
 
 #  get reference to task and keep it somewhere
 task = add.delay(5, 7)
 </code></pre>
 <pre><code data-trim>
 #  get task object by id
-task = add.AsyncResult(task.id)
+result = add.AsyncResult(task.id)
 
-if task.ready():
-    #  returns result or Exception
-    result = task.get()
-    ...
+if result.ready():
+    return result.get()
 else:
-    #  do something else
+    #  wait more
     ...
 </code></pre>
 </section>
 
-<!-- slide -->
+<!-- Slide -->
 <section>
-<h2>Don't rely on state</h2>
-<!-- code -->
+<h2>Getting Task State</h2>
 <pre><code data-trim>
-@celery.task
-def send_email(user_id):
-    user = User.objects.get(id=user_id)
+#  tasks have a state of 'SUCCESS', 'PENDING' or 'FAILURE'
+
+result = add.AsyncResult(task.id)
+
+if result.state == 'SUCCESS':
+    return result.get()
+else:
+    #  wait more
     ...
-    send_email(user.email, subject, body)
-
-
-#  why not just pass in the user object?
-
-send_email.delay(user_id=1234)
-
 </code></pre>
 </section>
 
@@ -373,37 +366,43 @@ send_email.delay(user_id=1234)
 <!-- code -->
 <p>Sometimes you need more detailed state messages.</p>
 <pre><code data-trim>
-...
-current_status = self.get_status()
-task.update_state(
-    state='PROGRESS',
-    meta={'progress': current_status}
-)
+#  This task has more specific status, outside of Celery.
+#  e.g. filesize
+
+    ...
+    percent_done = self.get_progress()
+    task.update_state(
+        state='PROGRESS',
+        meta={'progress': percent_done}
+    )
 </code></pre>
 </section>
 
 <!-- slide -->
 <section>
-<h2>Data outside of Celery</h2>
+<h2>Keeping state outside of Celery</h2>
 <p>This blog post: <span class="link">http://bit.ly/2eqd1DZ</span></p>
 <img class="no-border" src="img/caktus.png" />
 </section>
 
 <!-- slide -->
 <section>
-<h2>Data outside of Celery</h2>
-<p class="template template-left">Here we don't rely on Celery's task status to let us know whether the task completed successfully.</p>
-<pre><code>user.needs_welcome_email = True
-</code></pre>
+<h2>Keeping state outside of Celery</h2>
+<p class="template template-left">Here we <span class="highlight">don't</span> rely on Celery's task status to let us know whether the task completed successfully.</p>
 <pre><code>
-@celery.task
-def send_background_emails():
-  #  if task has not been run the Boolean value is True
-  for user in User.objects.filter_by(needs_welcome_email=True):
-      send_welcome_email(user.email)
-      user.needs_welcome_email = False
-      db.session.add(user)
-      db.session.commit()
+user = User(
+    username='foo', email='foo@bar.com', email_sent=False)
+
+
+#  Note that we tell Celery to ignore the result
+
+@celery.task(ignore_result=True)
+def send_email(user_id):
+    user = User.objects.get(id=user_id)
+    ...
+    #  record state in User profile
+    user.email_sent = True
+    user.save()
 </code></pre>
 </section>
 
@@ -421,7 +420,10 @@ def send_background_emails():
 <!-- Slide -->
 <section>
 <h2>Chaining Tasks</h2>
-<p class="template template-left">A <span class="highlight">signature()</span> wraps the arguments, keyword arguments, and execution options of a single task invocation in a way such that it can be passed to functions.</p>
+<ul>
+  <li>Sometimes you may want to pass the <span class="highlight">signature</span> of a task invocation to another process or as an argument to another function.</li>
+  <li>Tasks can be <span class="highlight">linked together</span>: the linked task is called when the task returns successfully.</li>
+</ul>
 </section>
 
 <!-- Slide -->
@@ -430,16 +432,12 @@ def send_background_emails():
 <p><span class="highlight">s()</span> is a shortcut for <span class="highlight">signature()</span>, using star arguments.</p>
 <!-- code -->
 <pre><code data-trim>
-#  the second task takes result of first task and 10 as args
+from celery import chain
 
+#  the second task takes result of first task and 10 as args
 tasks = chain(add.s(5, 7), add.s(10)).delay()
 
-
-
 #  use ids to obtain each task object
-#  you probably want to check task status
-#  before calling task.result
-
 result_one = add.AsyncResult(tasks.parent.id).result
 result_two = add.AsyncResult(tasks.id).result
 </code></pre>
@@ -447,105 +445,7 @@ result_two = add.AsyncResult(tasks.id).result
 
 <!-- Slide -->
 <section>
-<h1>Task Priority</h1>
-<p class="template template-left highlight">"RabbitMQ supports priorities since version 3.5.0, and the Redis transport emulates priority support."</p>
-<p class="template template-left">In Production, it is best to route high-priority tasks to dedicated workers.</p>
-</section>
-
-<!-- slide -->
-<section>
-<p>You can specify which queue a worker consumes using the <span class="highlight">-Q</span> option.</p>
-<pre><code data-trim>
-#  A high priority queue, with higher concurency
-
-python manage.py celery worker -Q high -c 10
-
-
-#  A Low priority queue, with lower concurency
-
-python manage.py celery worker -Q low -c 2
-</code></pre>
-</section>
-
-
-<!--  ////////////////////////  SETTING UP IN PRODUCTION  /////////////////////// -->
-<!-- Slide -->
-<section>
-<h1>Celery in Production</h1>
-</section>
-
-<!-- Slide -->
-<section>
-<h2>Daemonizing Celery</h2>
-<p>You need to be able to run Celery workers in background and restart automoatically.</p>
-<ul>
-  <li>Upstart</li>
-  <li>SupervisorD</li>
-</ul>
-TODO: does Upstart know how to run itself as a daemon?
-Do all it's processes run as a child of Upstart?
-</section>
-
-<!--  ////////////////////////  MONITORING AND TESTING  /////////////////////// -->
-<!-- Slide -->
-<section>
-<h1>Monitoring And Testing</h1>
-</section>
-
-<!-- Slide -->
-<section>
-<h2>Logging</h2>
-<ul>
-  <li>Celery has its own logger wrapper.</li>
-  <li>Your regular logs will get swallowed.</li>
-</ul>
-</section>
-
-<!-- slide -->
-<section>
-<h2>Logging</h2>
-<!-- code -->
-<pre><code data-trim>
-import logging
-from flask import Flask
-from celery.utils.log import get_task_logger
-</code></pre>
-
-<pre><code data-trim>
-#  normal logging in FLASK
-
-app = Flask(__name__)
-handler = logging.StreamHandler()
-app.logger.addHandler(handler)
-
-
-#  CELERY logging
-
-celery_logger = get_task_logger(__name__)
-</code></pre>
-</section>
-
-<!-- Slide -->
-<section>
-<h1>Celery Flower</h1>
-<img class="no-border" src="img/flower.png" />
-</section>
-
-<!-- Slide -->
-<section>
-<h2>Celery Flower</h2>
-<!-- code -->
-<pre><code data-trim>
-pip install flower
-</code></pre>
-<pre><code data-trim>
-celery flower -A app.celery --loglevel=info
-</code></pre>
-</section>
-
-<!-- Slide -->
-<section>
-<h1>Testing</h1>
+<h1>A Word on Testing</h1>
 <p>You probably don't want to wait for your unit tests to execute <span class="highlight">asynchronously</span>.</p>
 </section>
 
@@ -559,6 +459,133 @@ celery flower -A app.celery --loglevel=info
 </ul>
 </section>
 
+<!-- slide
+<section>
+<p>You can specify which queue a worker consumes using the <span class="highlight">-Q</span> option.</p>
+<pre><code data-trim>
+#  A high priority queue, with higher concurency
+
+python manage.py celery worker -Q high -c 10
+
+
+#  A Low priority queue, with lower concurency
+
+python manage.py celery worker -Q low -c 2
+</code></pre>
+</section>
+ -->
+
+<!--  ////////////////////////  SETTING UP IN PRODUCTION  /////////////////////// -->
+<!-- Slide -->
+<section>
+<h1>Celery in Production</h1>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Daemonizing Celery</h2>
+<ul>
+  <li>You need to be able to run Celery workers in <span class="highlight">background</span> and <span class="highlight">restart</span> workers automatically.</li>
+  <li>Daemonizing services include <span class="highlight">Init, Upstart*, SupervisorD</span>.</li>
+</ul>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Daemonizing Celery using Upstart</h2>
+<span class="highlight">/etc/init/celeryd.conf</span>
+<pre><code data-trim>
+description "celeryd"
+
+start on runlevel [2345]
+stop on runlevel [!2345]
+
+setuid celery
+setgid celery
+
+respawn
+
+chdir /path/to/app
+
+script
+    . /etc/environment
+    export PATH=/path/to/.env/bin
+    exec celery worker -A app.celery -c 4 -n worker1.%h
+end script
+</code></pre>
+</section>
+
+<!--  ////////////////////////  MONITORING AND TESTING  /////////////////////// -->
+<!-- Slide -->
+<section>
+<h1>Monitoring</h1>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Logging</h2>
+<ul>
+  <li>Celery has its own logging handler.</li>
+  <li>Your regular logs will get swallowed. Though there is the <span class="highlight">CELERYD_HIJACK_ROOT_LOGGER</span> option.</li>
+  <li>You can also set up <span class="highlight">per-task logging</span>.</li>
+</ul>
+</section>
+
+<!-- slide -->
+<section>
+<h2>Logging</h2>
+<!-- code -->
+<pre><code data-trim>
+import logging
+from celery.utils.log import get_task_logger
+
+#  Normal logging
+handler = logging.StreamHandler()
+logger.addHandler(handler)
+
+
+#  CELERY logging
+#  create a common logger for all of your tasks
+celery_logger = get_task_logger(__name__)
+
+@celery.task(ignore_result=True)
+def send_email(user_id):
+    ...
+    celery_logger.info(
+        'Email Sent to {}'.format(user.username))
+
+</code></pre>
+</section>
+
+<!-- Slide -->
+<section>
+<h1>Celery Flower</h1>
+</section>
+
+<!-- Slide -->
+<section>
+<h2>Celery Flower</h2>
+<p class="highlight">port :5555</p>
+<img class="no-border" src="img/flower.png" />
+</section>
+
+<!-- Slide -->
+<section>
+<!-- code -->
+<pre><code data-trim>
+pip install flower
+</code></pre>
+<pre><code data-trim>
+celery flower -A app.celery --loglevel=info
+</code></pre>
+</section>
+
+<!-- Slide -->
+<section>
+<h1>Task Priority</h1>
+<p class="template template-left highlight">"RabbitMQ supports priorities since version 3.5.0, and the Redis transport emulates priority support."</p>
+<p class="template template-left">In Production, it is best to route high-priority tasks to dedicated workers.</p>
+</section>
 
 <!-- Slide -->
 <section>
@@ -568,7 +595,6 @@ celery flower -A app.celery --loglevel=info
 <li>Each host must have access to the task code <span class="highlight">locally</span>.</li>
 </ul>
 </section>
-
 
 <!-- slide -->
 <section>
@@ -586,8 +612,9 @@ celery flower -A app.celery --loglevel=info
 <h1>Take Aways</h1>
 <div class="template template-left">
 <ul>
-<li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
-<li>Many <span class="highlight">small tasks</span> are better than one large one.
+  <li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
+  <li>Use the <span class="highlight">Celery Logger</span>.</li>
+  <li>Many <span class="highlight">small tasks</span> are better than one large one.
 </li>
 <li><span class="highlight">Don't block</span>. If you need to wait for the result it's not asychronous.</li>
 </ul>

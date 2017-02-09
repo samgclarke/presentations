@@ -1,9 +1,10 @@
-@import url('https://fonts.googleapis.com/css?family=Averia+Sans+Libre');
+@import url('https://fonts.googleapis.com/css?family=Acme');
 @import url('https://fonts.googleapis.com/css?family=Raleway');
 
 .reveal h1, .reveal h2 {
-	font-family: 'Averia Sans Libre', serif !important;
+	font-family: 'Acme', serif !important;
 	font-weight: normal;
+	text-transform: none;
 }
 .reveal p, .reveal li {
 	font-family: 'Raleway', serif !important;
