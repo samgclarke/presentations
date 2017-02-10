@@ -86,18 +86,40 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <section>
 <h1>Why this talk?</h1>
 <ul>
-  <li>New things are <span class="highlight">hard</span>.</li>
+  <li>New things are <span class="highlight">not obvious</span>.</li>
   <li><span class="highlight">Distributed</span> what?</li>
   <li>It's not just <span class="highlight">Python</span>?</li>
 </ul>
+</section>
+
+<!-- Contents Slide -->
+<section>
+<h1>Demystifying Celery</h1>
+<div style="margin-left: 200px">
+  <p class="template template-left center"><span class="lowlight">1. Introduction to Celery</span></p>
+  <p class="template template-left center"><span class="lowlight">2. Adding Celery to your application</span></p>
+  <p class="template template-left center"><span class="lowlight">3. Celery in Production</span></p>
+  <p class="template template-left center"><span class="lowlight">4. Logging and Monitoring</span></p>
+</div>
+</section>
+
+<!-- Contents Slide -->
+<section>
+<h1>Demystifying Celery</h1>
+<div style="margin-left: 200px">
+  <p class="template template-left center heading"><span class="highlight">1. Introduction to Celery</span></p>
+  <p class="template template-left center heading"><span class="lowlight">2. Adding Celery to your application</p>
+  <p class="template template-left center heading"><span class="lowlight">3. Celery in Production</p>
+  <p class="template template-left center heading"><span class="lowlight">4. Logging and Monitoring</p>
+</div>
 </section>
 
 <!-- Slide -->
 <section>
 <h1>What is Celery?</h1>
 <ul>
-<li>Celery is written in Python.</li>
-<li>Celery is a task queue.</li>
+<li>Celery is written in <span class="highlight">Python</span>.</li>
+<li>Celery is a <span class="highlight">task queue</span>.</li>
 <li><span class="highlight">Django-Celery</span> is also a thing.</li>
 </ul>
 </section>
@@ -122,30 +144,22 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
-<h1>Do I need Celery?</h1>
-<div class="template template-left">
-<span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p></span> 
-<p>Even apps of modest size can benefit from a task queue.</p>
-</div>
-</section>
-
-<!-- Slide -->
-<section>
 <h1>How Does Celery work?</h1>
+<p><span class="highlight">Brokers</span> & <span class="highlight">Backends</span></p>
 </section>
 
 <section>
-<h2>Celery Brokers</h2>
+<h1>Celery Brokers</h1>
 <div class="template template-left">
 <ul>
-<li>Celery communicates via <span class="highlight">messages</span>, usually using a <span class="highlight">broker</span> to mediate between clients and <span class="highlight">workers</span>.</li>
-<li>Common brokers are <span class="highlight">RabbitMQ, Redis</span>.</li>
+<li>Celery communicates to <span class="highlight">workers</span> via <span class="highlight">messages</span>, where the <span class="highlight">broker</span> acts as an agent.</li>
+<li>Recommended options are <span class="highlight">RabbitMQ, Redis</span>.</li>
 </ul>
 </div>
 </section>
 
 <section>
-<h2>Celery Backends</h2>
+<h1>Celery Backends</h1>
 <div class="template template-left">
 <ul>
 <li>Celery can store task state (optional) using a results <span class="highlight">backend</span>.</li>
@@ -156,7 +170,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
-<h2>Workers & Concurrency</h2>
+<h1>Workers & Concurrency</h1>
 <ul>
   <li>A <span class="highlight">worker</span> is a Celery process.</li>
   <li>By default <span class="highlight">multiprocessing</span> is used to perform concurrent execution of tasks.</li>
@@ -166,14 +180,20 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 
 <!--  ////////////////////////  SETTING UP CELERY  /////////////////////// -->
-<!-- Slide -->
+<!-- Contents Slide -->
 <section>
-<h1>Setting Up Celery</h1>
+<h1>Demystifying Celery</h1>
+<div style="margin-left: 200px">
+  <p class="template template-left center heading"><span class="lowlight">1. Introduction to Celery</span></p>
+  <p class="template template-left center heading"><span class="highlight">2. Adding Celery to your application</p>
+  <p class="template template-left center heading"><span class="lowlight">3. Celery in Production</p>
+  <p class="template template-left center heading"><span class="lowlight">4. Logging and Monitoring</p>
+</div>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Install system packages</h2>
+<h1>Install system packages</h1>
 <ul>
   <li>sudo <span class="highlight">apt-get</span> install rabbitmq-server (redis)</li>
   <li><span class="highlight">pip</span> install celery</li>
@@ -182,7 +202,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 
 <!-- Slide -->
 <section>
-<h2>Instantiating Celery</h2>
+<h1>Instantiating Celery</h1>
 <!-- code -->
 <pre><code data-trim>
 #  app.py
@@ -204,7 +224,7 @@ celery = Celery(
 
 <!-- Slide -->
 <section>
-<h2>Using a config file</h2>
+<h1>Using a config file</h1>
 <!-- code -->
 <pre><code data-trim>
 #  app.py
@@ -222,6 +242,7 @@ import os
 
 BROKER_URL = os.environ['BROKER_URL']
 CELERY_RESULT_BACKEND = os.environ['BACKEND_URL']
+CELERY_ACCEPT_CONTENT = ['json']
 CELERYD_POOL_RESTARTS = True
 ...
 </code></pre>
@@ -230,11 +251,12 @@ CELERYD_POOL_RESTARTS = True
 <!-- Slide -->
 <section>
 <h1>Registering Tasks</h1>
+<p class="highlight">Use the celery task decorator.</p>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Regular Function</h2>
+<h1>Regular Function</h1>
 <!-- code -->
 <pre><code data-trim>
 def send_email(user_id):
@@ -250,7 +272,7 @@ send_email(user_id=1234)
 
 <!-- Slide -->
 <section>
-<h2>Celery Function</h2>
+<h1>Celery Function</h1>
 <!-- code -->
 <pre><code data-trim>
 from app import celery
@@ -270,7 +292,7 @@ send_email.delay(user_id=1234)
 
 <!-- slide -->
 <section>
-<h2>Don't pass stateful objects</h2>
+<h1>Don't pass state to tasks!</h1>
 <!-- code -->
 <pre><code data-trim>
 @celery.task
@@ -289,7 +311,10 @@ send_email.delay(user_id=1234)
 <!-- Slide -->
 <section>
 <h1>Starting Celery</h1>
-<p>celery worker <span class="highlight">--app</span> app.celery <span class="highlight">--concurrency</span> 4</p>
+<!-- code -->
+<pre><code data-trim>
+celery worker --app app.celery --concurrency 4
+</code></pre>
 <p></p>
 <ul>
   <li><span class="highlight">app (-A)</span>: relative path to celery instance</li>
@@ -305,7 +330,7 @@ send_email.delay(user_id=1234)
 
 <!-- Slide -->
 <section>
-<h2>Getting Results</h2>
+<h1>Getting Results</h1>
 <!-- code -->
 <pre><code data-trim>
 #  This complex function returns a useful result
@@ -320,10 +345,9 @@ result = add.delay(5, 7)
 
 <!-- Slide -->
 <section>
-<h2>Getting Results</h2>
+<h1>Getting Results</h1>
 <pre><code data-trim>
 from celery import Celery
-from celery.result import AsyncResult
 
 @celery.task
 def add(x, y):
@@ -331,63 +355,76 @@ def add(x, y):
 
 #  get reference to task and keep it somewhere
 task = add.delay(5, 7)
-</code></pre>
-<pre><code data-trim>
-#  get task object by id
+
+#  get task object by id, using the AsyncResult property
 result = add.AsyncResult(task.id)
 
 if result.ready():
     return result.get()
 else:
-    #  wait more
-    ...
+    #  do something else
 </code></pre>
+</section>
+
+<!-- slide -->
+<section>
+<h1>Useful AsyncResult methods</h1>
+<ul>
+  <li><span class="highlight">result.get()</span> - blocks until ready. Returns result or Exception.</li>
+  <li><span class="highlight">result.successful()</span> - returns True or False</li>
+  <li><span class="highlight">result.ready()</span> - returns True if task is done.</li>
+  <li><span class="highlight">result.revoke()</span> - workers will ignore task. If terminate=True, execution is killed.
+  <li><span class="highlight">result.result</span> - the task return value.
+</ul>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Getting Task State</h2>
+<h1>Getting Task State</h1>
+<p class="template template-left">Possible task states:</p>
+<p class="template template-left"><span class="highlight">PENDING</span>, <span class="highlight">STARTED</span>, <span class="highlight">SUCCESS</span>, <span class="highlight">FAILURE</span> or <span class="highlight">REVOKED</span>.</p>
 <pre><code data-trim>
-#  tasks have a state of 'SUCCESS', 'PENDING' or 'FAILURE'
 
 result = add.AsyncResult(task.id)
 
 if result.state == 'SUCCESS':
+    #  do something with the result
     return result.get()
 else:
-    #  wait more
+    #  do something else
     ...
 </code></pre>
 </section>
 
 <!-- slide -->
 <section>
-<h2>Custom States</h2>
+<h1>Custom States</h1>
 <!-- code -->
-<p>Sometimes you need more detailed state messages.</p>
+<p>Sometimes you need more <span class="highlight">detailed</span> state messages.</p>
 <pre><code data-trim>
-#  This task has more specific status, outside of Celery.
-#  e.g. filesize
+#  This task specific status (filesize) external to Celery
+#  'PROGRESS' is our custom state
 
-    ...
-    percent_done = self.get_progress()
-    task.update_state(
-        state='PROGRESS',
-        meta={'progress': percent_done}
-    )
+...
+percent_done = self._get_progress()
+task.update_state(
+    state='PROGRESS',
+    meta={'progress': percent_done}
+)
+...
 </code></pre>
 </section>
 
 <!-- slide -->
 <section>
-<h2>Keeping state outside of Celery</h2>
+<h1>Keeping state outside of Celery</h1>
 <p>This blog post: <span class="link">http://bit.ly/2eqd1DZ</span></p>
 <img class="no-border" src="img/caktus.png" />
 </section>
 
 <!-- slide -->
 <section>
-<h2>Keeping state outside of Celery</h2>
+<h1>Keeping state outside of Celery</h1>
 <p class="template template-left">Here we <span class="highlight">don't</span> rely on Celery's task status to let us know whether the task completed successfully.</p>
 <pre><code>
 user = User(
@@ -400,58 +437,62 @@ user = User(
 def send_email(user_id):
     user = User.objects.get(id=user_id)
     ...
-    #  record state in User profile
+    #  email sent, record state in User profile
     user.email_sent = True
     user.save()
 </code></pre>
 </section>
 
-<!-- slide -->
+<!-- Slide -->
 <section>
-<h2>Useful Task methods</h2>
+<h1>More complex workflows</h1>
 <ul>
-  <li><span class="highlight">task.get()</span> - blocks until ready. Returns result or Exception.</li>
-  <li><span class="highlight">task.successful()</span> - returns True or False</li>
-  <li><span class="highlight">task.ready()</span> - returns True if task is done.</li>
-  <li><span class="highlight">task.revoke()</span> - workers will ignore task. If terminate=True, execution is killed.
+  <li><span class="highlight">Celery Canvas</span> allows combining of tasks in interesting ways using <span class="highlight">signatures</span>.</li>
+  <li>A signature is a <span class="highlight">serializable</span> representation of a task.</li>
+  <li>Useful signatures include: <span class="highlight">group</span>, <span class="highlight">chain*</span>, <span class="highlight">chord</span>, <span class="highlight">map</span>.</li>
 </ul>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Chaining Tasks</h2>
+<h1>Chaining Tasks</h1>
 <ul>
-  <li>Sometimes you may want to pass the <span class="highlight">signature</span> of a task invocation to another process or as an argument to another function.</li>
+  <li>Task signatures can be passed to other tasks.</li>
   <li>Tasks can be <span class="highlight">linked together</span>: the linked task is called when the task returns successfully.</li>
+  <li>A chain is multiple tasks run in series - allows tasks to be <span class="highlight">composed</span> together rather than blocking each other.</li>
 </ul>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Chaining Tasks</h2>
-<p><span class="highlight">s()</span> is a shortcut for <span class="highlight">signature()</span>, using star arguments.</p>
+<h1>Chaining Tasks</h1>
+<p><span class="highlight">s()</span> is a shortcut for <span class="highlight">signature()</span>.</p>
 <!-- code -->
 <pre><code data-trim>
 from celery import chain
 
 #  the second task takes result of first task and 10 as args
-tasks = chain(add.s(5, 7), add.s(10)).delay()
+tasks = chain(
+    add.s(5, 7),
+    add.s(10)).delay()
 
-#  use ids to obtain each task object
-result_one = add.AsyncResult(tasks.parent.id).result
+#  this is the result of the chain (final task)
 result_two = add.AsyncResult(tasks.id).result
+
+#  we can traverse the task tree to get previous results
+result_one = add.AsyncResult(tasks.parent.id).result
 </code></pre>
 </section>
 
 <!-- Slide -->
 <section>
-<h1>Testing</h1>
+<h1>Testing Celery Tasks</h1>
 <p>You probably don't want to wait for your unit tests to execute <span class="highlight">asynchronously</span>.</p>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Testing Options</h2>
+<h1>Testing Options</h1>
 <ul>
   <li>Use Celery's <span class="highlight">ALWAYS_EAGER</span> mode.</li>
   <li>Use <span class="highlight">task.apply_async()</span> instead of <span class="highlight">task.delay()</span>.</li>
@@ -476,14 +517,20 @@ python manage.py celery worker -Q low -c 2
  -->
 
 <!--  ////////////////////////  SETTING UP IN PRODUCTION  /////////////////////// -->
-<!-- Slide -->
+<!-- Contents Slide -->
 <section>
-<h1>Celery in Production</h1>
+<h1>Demystifying Celery</h1>
+<div style="margin-left: 200px">
+  <p class="template template-left center heading"><span class="lowlight">1. Introduction to Celery</span></p>
+  <p class="template template-left center heading"><span class="lowlight">2. Adding Celery to your application</p>
+  <p class="template template-left center heading"><span class="highlight">3. Celery in Production</p>
+  <p class="template template-left center heading"><span class="lowlight">4. Logging and Monitoring</p>
+</div>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Daemonizing Celery</h2>
+<h1>Daemonizing Celery</h1>
 <ul>
   <li>You need to be able to run Celery workers in <span class="highlight">background</span> and <span class="highlight">restart</span> workers automatically.</li>
   <li>Daemonizing services include <span class="highlight">Init, Upstart*, SupervisorD</span>.</li>
@@ -492,7 +539,7 @@ python manage.py celery worker -Q low -c 2
 
 <!-- Slide -->
 <section>
-<h2>Daemonizing Celery using Upstart</h2>
+<h1>Daemonizing Celery using Upstart</h1>
 <span class="highlight">/etc/init/celeryd.conf</span>
 <pre><code data-trim>
 description "celeryd"
@@ -516,14 +563,20 @@ end script
 </section>
 
 <!--  ////////////////////////  MONITORING AND TESTING  /////////////////////// -->
-<!-- Slide -->
+<!-- Contents Slide -->
 <section>
-<h1>Monitoring</h1>
+<h1>Demystifying Celery</h1>
+<div style="margin-left: 200px">
+  <p class="template template-left center heading"><span class="lowlight">1. Introduction to Celery</span></p>
+  <p class="template template-left center heading"><span class="lowlight">2. Adding Celery to your application</p>
+  <p class="template template-left center heading"><span class="lowlight">3. Celery in Production</p>
+  <p class="template template-left center heading"><span class="highlight">4. Logging and Monitoring</p>
+</div>
 </section>
 
 <!-- Slide -->
 <section>
-<h2>Logging</h2>
+<h1>Logging</h1>
 <ul>
   <li>Celery has its own logging handler.</li>
   <li>Your regular logs will get swallowed. Though there is the <span class="highlight">CELERYD_HIJACK_ROOT_LOGGER</span> option.</li>
@@ -533,7 +586,7 @@ end script
 
 <!-- slide -->
 <section>
-<h2>Logging</h2>
+<h1>Logging</h1>
 <!-- code -->
 <pre><code data-trim>
 import logging
@@ -560,23 +613,22 @@ def send_email(user_id):
 <!-- Slide -->
 <section>
 <h1>Celery Flower</h1>
-</section>
-
-<!-- Slide -->
-<section>
-<h2>Celery Flower</h2>
-<p class="highlight">port :5555</p>
+<ul>
+  <li>Web interface for monitoring Celery.</li>
+  <li>By default runs on port :5555</li>
+</ul>
 <img class="no-border" src="img/flower.png" />
 </section>
 
 <!-- Slide -->
 <section>
+<h1>Installing Flower</h1>
 <!-- code -->
 <pre><code data-trim>
 pip install flower
 </code></pre>
 <pre><code data-trim>
-celery flower -A app.celery --loglevel=info
+celery flower -A app.celery
 </code></pre>
 </section>
 
@@ -587,18 +639,19 @@ celery flower -A app.celery --loglevel=info
 <p class="template template-left">In Production, it is best to route high-priority tasks to dedicated workers.</p>
 </section>
 
-<!-- Slide -->
+<!-- Slide 
 <section>
-<h2>Distributing Workers</h2>
+<h1>Distributing Workers</h1>
 <ul>
 <li>Add hosts address. TODO: clarify this.</li>
 <li>Each host must have access to the task code <span class="highlight">locally</span>.</li>
 </ul>
 </section>
+-->
 
 <!-- slide -->
 <section>
-<h2>Celery Alternatives</h2>
+<h1>Celery Alternatives</h1>
 <ul>
 <li><span class="highlight">Huey</span>. <span class="link">https://github.com/coleifer/huey</span></li>
 </ul>
@@ -606,18 +659,35 @@ celery flower -A app.celery --loglevel=info
 
 
 <!--  ////////////////////////  CONCLUSION  /////////////////////// -->
+<section>
+<h1>Useful Options</h1>
+<ul>
+  <li><span class="highlight">ACKS_LATE</span> usef</li>
+</ul>
+</section>
 
 <!-- Slide -->
 <section>
 <h1>Take Aways</h1>
 <div class="template template-left">
 <ul>
+  <li>RabbitMQ as message borker. Redis makes a good Backend.</li>
   <li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
-  <li>Use the <span class="highlight">Celery Logger</span>.</li>
-  <li>Many <span class="highlight">small tasks</span> are better than one large one.
+  <li>Don't depend on the root logger, use the <span class="highlight">Celery Logger</span>.</li>
+  <li>Don't use Pickle. <span class="highlight">CELERY_ACCEPT_CONTENT = ['json']</span></li>
+  <li>ACK LATE</li>
 </li>
 <li><span class="highlight">Don't block</span>. If you need to wait for the result it's not asychronous.</li>
 </ul>
+</div>
+</section>
+
+<!-- Slide -->
+<section>
+<h1>Do I need Celery?</h1>
+<div class="template template-left">
+<span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p></span> 
+<p>Even apps of modest size can benefit from a task queue.</p>
 </div>
 </section>
 
@@ -647,8 +717,9 @@ celery flower -A app.celery --loglevel=info
                 progress: true,
                 history: true,
                 center: true,
-
-                transition: 'slide', // none/fade/slide/convex/concave/zoom
+                
+                slideNumber: true,
+                transition: 'fade', // none/fade/slide/convex/concave/zoom
 
                 // Optional reveal.js plugins
                 dependencies: [
