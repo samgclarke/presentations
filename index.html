@@ -67,13 +67,14 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <!-- Slide -->
 <section>
 <h1>Who I am</h1>
+<p class="highlight"><strong>Sam Clarke</strong></p>
 <ul>
   <li>Technical Director @ <strong><span class="highlight">Rival Schools</span></strong></li>
   <li>Lead Developer &nbsp;&nbsp;&nbsp; @ <strong><span class="highlight">Script Speaker</span></strong></li>
 </ul>
 </section>
 
-<!-- Slide -->
+<!-- Slide 
 <section>
 <h1>Who I am <strong>NOT</strong></h1>
 <ul>
@@ -81,12 +82,13 @@ joke: Core Devs missed an opportunity here for the logo...-->
   <li>Not an expert</li>
 </ul>
 </section>
+-->
 
 <!-- Slide -->
 <section>
 <h1>Why this talk?</h1>
 <ul>
-  <li>New things are <span class="highlight">not obvious</span>.</li>
+  <li>New things are <span class="highlight">hard</span>.</li>
   <li><span class="highlight">Distributed</span> what?</li>
   <li>It's not just <span class="highlight">Python</span>?</li>
 </ul>
@@ -172,9 +174,9 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <section>
 <h1>Workers & Concurrency</h1>
 <ul>
-  <li>A <span class="highlight">worker</span> is a Celery process.</li>
-  <li>By default <span class="highlight">multiprocessing</span> is used to perform concurrent execution of tasks.</li>
-  <li>The number of worker processes/threads can be changed using the <span class="highlight">--concurrency</span> argument and defaults to the number of CPUs.</li>
+  <li>A <span class="highlight">worker</span> is a Celery process, which can spawn child processes.</li>
+  <li>By default <span class="highlight">multiprocessing</span> is used to perform <span class="highlight">concurrent</span> execution of tasks.</li>
+  <li>The number of worker processes/threads can be changed using the <span class="highlight">--concurrency</span> argument (defaults to the number of CPUs).</li>
 </ul>
 </section>
 
@@ -194,10 +196,12 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <!-- Slide -->
 <section>
 <h1>Install system packages</h1>
-<ul>
-  <li>sudo <span class="highlight">apt-get</span> install rabbitmq-server (redis)</li>
-  <li><span class="highlight">pip</span> install celery</li>
-</ul>
+<pre><code data-trim>
+  sudo apt-get install rabbitmq-server (redis)
+</code></pre>
+<pre><code data-trim>
+  pip install celery
+</code></pre>
 </section>
 
 <!-- Slide -->
@@ -237,13 +241,12 @@ celery.config_from_object('celery_config')
 
 <pre><code data-trim>
 #  celery_config.py
-
 import os
 
-BROKER_URL = os.environ['BROKER_URL']
-CELERY_RESULT_BACKEND = os.environ['BACKEND_URL']
-CELERY_ACCEPT_CONTENT = ['json']
-CELERYD_POOL_RESTARTS = True
+#  note settings are lower case since version>=4.0 
+broker_url = os.environ['BROKER_URL']
+result_backend = os.environ['BACKEND_URL']
+worker_pool_restarts = True
 ...
 </code></pre>
 </section>
@@ -276,7 +279,6 @@ send_email(user_id=1234)
 <!-- code -->
 <pre><code data-trim>
 from app import celery
-
 
 @celery.task
 def send_email(user_id):
@@ -312,7 +314,7 @@ send_email.delay(user_id=1234)
 <section>
 <h1>Starting Celery</h1>
 <!-- code -->
-<pre><code data-trim>
+<pre style="margin-left: 150px; width: 625px;"><code data-trim>
 celery worker --app app.celery --concurrency 4
 </code></pre>
 <p></p>
@@ -333,7 +335,8 @@ celery worker --app app.celery --concurrency 4
 <h1>Getting Results</h1>
 <!-- code -->
 <pre><code data-trim>
-#  This complex function returns a useful result
+from app import celery
+
 @celery.task
 def add(x, y):
     return x + y
@@ -347,7 +350,7 @@ result = add.delay(5, 7)
 <section>
 <h1>Getting Results</h1>
 <pre><code data-trim>
-from celery import Celery
+from app import celery
 
 @celery.task
 def add(x, y):
@@ -381,7 +384,7 @@ else:
 <!-- Slide -->
 <section>
 <h1>Getting Task State</h1>
-<p class="template template-left">Possible task states:</p>
+<p class="template template-left">Possible default task states:</p>
 <p class="template template-left"><span class="highlight">PENDING</span>, <span class="highlight">STARTED</span>, <span class="highlight">SUCCESS</span>, <span class="highlight">FAILURE</span> or <span class="highlight">REVOKED</span>.</p>
 <pre><code data-trim>
 
@@ -492,7 +495,7 @@ result_one = add.AsyncResult(tasks.parent.id).result
 
 <!-- Slide -->
 <section>
-<h1>Testing Options</h1>
+<h1>Testing strategies</h1>
 <ul>
   <li>Use Celery's <span class="highlight">ALWAYS_EAGER</span> mode.</li>
   <li>Use <span class="highlight">task.apply_async()</span> instead of <span class="highlight">task.delay()</span>.</li>
@@ -541,7 +544,7 @@ python manage.py celery worker -Q low -c 2
 <section>
 <h1>Daemonizing Celery using Upstart</h1>
 <span class="highlight">/etc/init/celeryd.conf</span>
-<pre><code data-trim>
+<pre style="font-size: 18px;"><code data-trim>
 description "celeryd"
 
 start on runlevel [2345]
@@ -588,7 +591,7 @@ end script
 <section>
 <h1>Logging</h1>
 <!-- code -->
-<pre><code data-trim>
+<pre style="font-size: 18px;"><code data-trim>
 import logging
 from celery.utils.log import get_task_logger
 
@@ -613,11 +616,11 @@ def send_email(user_id):
 <!-- Slide -->
 <section>
 <h1>Celery Flower</h1>
+<img class="no-border" src="img/flower.png" />
 <ul>
   <li>Web interface for monitoring Celery.</li>
-  <li>By default runs on port :5555</li>
+  <li>By default runs on port <span class="highlight">:5555</span></li>
 </ul>
-<img class="no-border" src="img/flower.png" />
 </section>
 
 <!-- Slide -->
@@ -653,31 +656,24 @@ celery flower -A app.celery
 <section>
 <h1>Celery Alternatives</h1>
 <ul>
-<li><span class="highlight">Huey</span>. <span class="link">https://github.com/coleifer/huey</span></li>
+<li><span class="highlight">Huey</span> - <span class="link">https://github.com/coleifer/huey</span></li>
+<li><span class="highlight">RQ</span> - <span class="link">http://python-rq.org/</span></li>
 </ul>
 </section>
 
 
 <!--  ////////////////////////  CONCLUSION  /////////////////////// -->
-<section>
-<h1>Useful Options</h1>
-<ul>
-  <li><span class="highlight">ACKS_LATE</span> usef</li>
-</ul>
-</section>
 
 <!-- Slide -->
 <section>
 <h1>Take Aways</h1>
 <div class="template template-left">
 <ul>
-  <li>RabbitMQ as message borker. Redis makes a good Backend.</li>
+  <li><span class="highlight">Don't block</span>. If you need to wait for the result it's not asychronous.</li>
+  <li>Use <span class="highlight">RabbitMQ</span> as broker. <span class="highlight">Redis</span> is a good backend.</li>
   <li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
-  <li>Don't depend on the root logger, use the <span class="highlight">Celery Logger</span>.</li>
-  <li>Don't use Pickle. <span class="highlight">CELERY_ACCEPT_CONTENT = ['json']</span></li>
-  <li>ACK LATE</li>
-</li>
-<li><span class="highlight">Don't block</span>. If you need to wait for the result it's not asychronous.</li>
+  <li>Use the <span class="highlight">Celery Logger</span> inside tasks.</li>
+  <li>Set <span class="highlight">task_acks_late</span> can increase reliability for idempotent tasks.</li>
 </ul>
 </div>
 </section>
@@ -689,6 +685,11 @@ celery flower -A app.celery
 <span class="highlight"><p>Even though it adds complexity, Celery is still one of my go-to tools for any new web app.</p></span> 
 <p>Even apps of modest size can benefit from a task queue.</p>
 </div>
+</section>
+
+<section>
+<h1>Thank you</h1>
+<img style="width: 50px; background: none; vertical-align: middle; margin: 0px 5px; box-shadow: none;" class="no-border" src="img/twitter.png" /> <span class="link">@samclarkeg</span>
 </section>
 
 <!-- Slide -->
