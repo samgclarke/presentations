@@ -164,7 +164,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <ul>
   <li>A <span class="highlight">worker</span> is a Celery process, which can spawn child processes.</li>
   <li>By default <span class="highlight">multiprocessing</span> is used to perform <span class="highlight">concurrent</span> execution of tasks.</li>
-  <li>The number of worker processes/threads can be changed using the <span class="highlight">--concurrency</span> argument (defaults to the number of CPUs).</li>
+  <li>Specify number of worker processes/threads with the <span class="highlight">--concurrency</span> argument, which defaults to the number of CPUs.</li>
 </ul>
 </section>
 
@@ -202,16 +202,14 @@ joke: Core Devs missed an opportunity here for the logo...-->
 from celery import Celery
 
 celery = Celery(
-   'tasks',
+   'app',
     broker="amqp://guest@localhost//",
     backend="redis://localhost:6379/0"
 )
 
 #  Note: in production, use a deciated user/ vhost
-#  with appropriate permissions
+#  with appropriate permissions for broker/ backend
 </code></pre>
-
-<p>or...</p>
 </section>
 
 <!-- Slide -->
@@ -229,9 +227,10 @@ celery.config_from_object('celery_config')
 
 <pre><code data-trim>
 #  celery_config.py
+
 import os
 
-#  note settings are lower case since version>=4.0 
+#  note settings are lower case since version >= 4.0 
 broker_url = os.environ['BROKER_URL']
 result_backend = os.environ['BACKEND_URL']
 worker_pool_restarts = True
@@ -241,8 +240,30 @@ worker_pool_restarts = True
 
 <!-- Slide -->
 <section>
+<h1>Starting Celery</h1>
+<!-- code -->
+<pre style="margin: 0px auto; width: 460px;"><code data-trim>
+celery worker -A app.celery -c 2
+</code></pre>
+<p></p>
+<ul>
+  <li><span class="highlight">-A (--app)</span>: relative path to celery instance</li>
+  <li><span class="highlight">-c (--concurrency)</span>: number of child process</li>
+</ul>
+</section>
+
+<!-- Slide -->
+<section>
+<div style="float:left; width: 30%; text-align: left; font-size: 0.8em;">
+<p>Example output from a Celery worker running locally.</p>
+<p>Highlighted are the <span class="highlight">configuration</span> and the <span class="highlight">registered tasks</span>.</p></div>
+<div style="float:left; width: 70%;"><img class="no-border" src="img/celery-terminal-stroke.png" /></div>
+</section>
+
+<!-- Slide -->
+<section>
 <h1>Registering Tasks</h1>
-<p class="highlight">Use the celery task decorator.</p>
+<p class="highlight">The Celery task decorator.</p>
 </section>
 
 <!-- Slide -->
@@ -250,6 +271,8 @@ worker_pool_restarts = True
 <h1>Regular Function</h1>
 <!-- code -->
 <pre><code data-trim>
+#  tasks.py
+
 def send_email(user_id):
     user = User.objects.get(id=user_id)
     subject = 'Welcome, {}'.format(user.username)
@@ -266,6 +289,8 @@ send_email(user_id=1234)
 <h1>Celery Function</h1>
 <!-- code -->
 <pre><code data-trim>
+#  tasks.py
+
 from app import celery
 
 @celery.task
@@ -285,6 +310,8 @@ send_email.delay(user_id=1234)
 <h1>Don't pass state to tasks!</h1>
 <!-- code -->
 <pre><code data-trim>
+#  tasks.py
+
 @celery.task
 def send_email(user_id):
     user = User.objects.get(id=user_id)
@@ -296,26 +323,6 @@ def send_email(user_id):
 #  why not just pass in the user object?
 send_email.delay(user_id=1234)
 </code></pre>
-</section>
-
-<!-- Slide -->
-<section>
-<h1>Starting Celery</h1>
-<!-- code -->
-<pre style="margin-left: 150px; width: 625px;"><code data-trim>
-celery worker --app app.celery --concurrency 4
-</code></pre>
-<p></p>
-<ul>
-  <li><span class="highlight">app (-A)</span>: relative path to celery instance</li>
-  <li><span class="highlight">concurrency (-C)</span>: number of child process</li>
-</ul>
-</section>
-
-<!-- Slide -->
-<section>
-<div style="float:left; width: 30%; text-align: left;"><p>Example output from a Celery worker running locally.</p></div>
-<div style="float:left; width: 70%;"><img class="no-border" src="img/celery-terminal-stroke.png" /></div>
 </section>
 
 <!-- Slide -->
@@ -344,11 +351,11 @@ from app import celery
 def add(x, y):
     return x + y
 
-#  get reference to task and keep it somewhere
-task = add.delay(5, 7)
+#  store a reference to task AsyncResult
+async_result = add.delay(5, 7)
 
-#  get task object by id, using the AsyncResult property
-result = add.AsyncResult(task.id)
+#  get async result using the task's AsyncResult method
+result = add.AsyncResult(async_result.id)
 
 if result.ready():
     return result.get()
@@ -361,11 +368,11 @@ else:
 <section>
 <h1>Useful AsyncResult methods</h1>
 <ul>
-  <li><span class="highlight">result.get()</span> - blocks until ready. Returns result or Exception.</li>
-  <li><span class="highlight">result.successful()</span> - returns True or False</li>
-  <li><span class="highlight">result.ready()</span> - returns True if task is done.</li>
-  <li><span class="highlight">result.revoke()</span> - workers will ignore task. If terminate=True, execution is killed.
-  <li><span class="highlight">result.result</span> - the task return value.
+  <li><span class="highlight">.get()</span> - blocks until ready. Returns result or Exception.</li>
+  <li><span class="highlight">.successful()</span> - returns True is task executed successfully.</li>
+  <li><span class="highlight">.ready()</span> - returns True if task is done.</li>
+  <li><span class="highlight">.revoke()</span> - workers will ignore task. If terminate=True, execution is killed.
+  <!--<li><span class="highlight">.result</span> - the task return value.-->
 </ul>
 </section>
 
@@ -376,7 +383,7 @@ else:
 <p class="template template-left"><span class="highlight">PENDING</span>, <span class="highlight">STARTED</span>, <span class="highlight">SUCCESS</span>, <span class="highlight">FAILURE</span> or <span class="highlight">REVOKED</span>.</p>
 <pre><code data-trim>
 
-result = add.AsyncResult(task.id)
+result = add.AsyncResult(async_result.id)
 
 if result.state == 'SUCCESS':
     #  do something with the result
@@ -409,21 +416,14 @@ task.update_state(
 <!-- slide -->
 <section>
 <h1>Keeping state outside of Celery</h1>
-<p>This blog post: <span class="link">http://bit.ly/2eqd1DZ</span></p>
-<img class="no-border" src="img/caktus.png" />
-</section>
-
-<!-- slide -->
-<section>
-<h1>Keeping state outside of Celery</h1>
 <p class="template template-left">Here we <span class="highlight">don't</span> rely on Celery's task status to let us know whether the task completed successfully.</p>
 <pre><code>
 user = User(
     username='foo', email='foo@bar.com', email_sent=False)
 
 
-#  Note that we tell Celery to ignore the result
-
+#  Note that we tell Celery to
+#  ignore the result
 @celery.task(ignore_result=True)
 def send_email(user_id):
     user = User.objects.get(id=user_id)
@@ -432,6 +432,13 @@ def send_email(user_id):
     user.email_sent = True
     user.save()
 </code></pre>
+</section>
+
+<!-- slide -->
+<section>
+<h1>Keeping state outside of Celery</h1>
+<p>This blog post: <span class="link">http://bit.ly/2eqd1DZ</span></p>
+<img class="no-border" style="opacity: 0.8; border-radius: 5px;" src="img/caktus.png" />
 </section>
 
 <!-- Slide -->
@@ -457,7 +464,7 @@ def send_email(user_id):
 <!-- Slide -->
 <section>
 <h1>Chaining Tasks</h1>
-<p><span class="highlight">s()</span> is a shortcut for <span class="highlight">signature()</span>.</p>
+<p><span class="highlight">.s()</span> - shorthand for <span class="highlight">.signature()</span></p>
 <!-- code -->
 <pre><code data-trim>
 from celery import chain
@@ -603,7 +610,7 @@ def send_email(user_id):
 
 <!-- Slide -->
 <section>
-<h1>Celery Flower</h1>
+<h1>Monitoring with Flower</h1>
 <img class="no-border" src="img/flower.png" />
 <ul>
   <li>Web interface for monitoring Celery.</li>
@@ -661,7 +668,7 @@ celery flower -A app.celery
   <li>Use <span class="highlight">RabbitMQ</span> as broker. <span class="highlight">Redis</span> is a good backend.</li>
   <li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
   <li>Use the <span class="highlight">Celery Logger</span> inside tasks.</li>
-  <li>Set <span class="highlight">task_acks_late</span> can increase reliability for idempotent tasks.</li>
+  <li><span class="highlight">task_acks_late</span> can increase reliability for idempotent tasks.</li>
 </ul>
 </div>
 </section>
@@ -677,11 +684,11 @@ celery flower -A app.celery
 
 <section>
 <h1>Thank you</h1>
-<p><img style="width: 50px; background: none; vertical-align: middle; margin: 0px 5px; box-shadow: none;" class="no-border" src="img/twitter.png" /> <span class="link">@samclarkeg</span></p>
-<p><img style="width: 50px; background: none; vertical-align: middle; margin: 0px 5px; box-shadow: none;" class="no-border" src="img/github.png" /></p>
+<p><img style="width: 50px; vertical-align: middle; margin: 0px;" class="no-border" src="img/twitter.png" /> <span class="link">@samclarkeg</span></p>
+<p><img style="width: 50px; vertical-align: middle; margin: 0px;" class="no-border" src="img/github.png" /> <span class="link">github.com/samgclarke</span></p>
 </section>
 
-<!-- Slide -->
+<!-- Slide 
 <section>
 <h1>References</h1>
 <ul>
@@ -689,7 +696,7 @@ celery flower -A app.celery
   <li><a href="https://denibertovic.com/posts/celery-best-practices/">https://denibertovic.com/posts/celery-best-practices/</a></li>
 </li>
 </section>
-
+-->
 
             </div>
 

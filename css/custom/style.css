@@ -8,7 +8,7 @@
 }
 .reveal p, .reveal li {
 	font-family: 'Raleway', serif !important;
-	padding-bottom: 20px;
+	padding-bottom: 25px;
 }
 
 
@@ -33,11 +33,14 @@
 }
 .link {
 	color: #87cefa;
-	text-decoration: underline;
+	/*text-decoration: underline;*/
+	border-bottom: 1px solid #87cefa;
 }
 
 .reveal section img.no-border {
 	border: none;
+	background: none; 
+	box-shadow: none;
 }
 
 .reveal pre code {
