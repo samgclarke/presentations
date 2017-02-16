@@ -448,7 +448,7 @@ def send_email(user_id):
 <h1>Relying on Celery</h1>
 <ul> 
   <li><span class="highlight">task_acks_late</span> - workers acknowledge task after execution, not before.</li>
-  <li>Can increase reliability for idempotent tasks.</li>
+  <li>Can increase reliability for <span class="highlight">idempotent</span> tasks.</li>
 </ul>
 </section>
 
@@ -481,15 +481,15 @@ def send_email(user_id):
 from celery import chain
 
 #  the second task takes result of first task and 10 as args
-tasks = chain(
+async_result = chain(
     add.s(5, 7),
     add.s(10)).delay()
 
 #  this is the result of the chain (final task)
-result_two = add.AsyncResult(tasks.id).result
+result_two = add.AsyncResult(async_result.id).result
 
 #  we can traverse the task tree to get previous results
-result_one = add.AsyncResult(tasks.parent.id).result
+result_one = add.AsyncResult(async_result.parent.id).result
 </code></pre>
 </section>
 
