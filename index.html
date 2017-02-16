@@ -165,7 +165,7 @@ joke: Core Devs missed an opportunity here for the logo...-->
 <h1>Workers & Concurrency</h1>
 <ul>
   <li>A <span class="highlight">worker</span> is a Celery process, which can spawn child processes.</li>
-  <li>By default <span class="highlight">multiprocessing</span> is used to perform <span class="highlight">concurrent</span> execution of tasks.</li>
+  <!--<li>By default <span class="highlight">multiprocessing</span> is used to perform <span class="highlight">concurrent</span> execution of tasks.</li>-->
   <li>Specify number of worker processes/threads with the <span class="highlight">--concurrency</span> argument, which defaults to the number of CPUs.</li>
 </ul>
 </section>
@@ -209,7 +209,7 @@ celery = Celery(
     backend="redis://localhost:6379/0"
 )
 
-#  Note: in production, use a deciated user/ vhost
+#  Note: in production, use a dedicated user/ vhost
 #  with appropriate permissions for broker/ backend
 </code></pre>
 </section>
@@ -443,6 +443,14 @@ def send_email(user_id):
 <img class="no-border" style="opacity: 0.8; border-radius: 5px;" src="img/caktus.png" />
 </section>
 
+<!-- slide -->
+<section>
+<h1>Relying on Celery</h1>
+<ul> 
+  <li><span class="highlight">task_acks_late</span> - workers acknowledge task after execution, not before.</li>
+  <li>Can increase reliability for idempotent tasks.</li>
+<ul>
+
 <!-- Slide -->
 <section>
 <h1>More complex workflows</h1>
@@ -670,7 +678,6 @@ celery flower -A app.celery
   <li>Use <span class="highlight">RabbitMQ</span> as broker. <span class="highlight">Redis</span> is a good backend.</li>
   <li>Don't send objects to tasks. <span class="highlight">State</span> can change.</li>
   <li>Use the <span class="highlight">Celery Logger</span> inside tasks.</li>
-  <li><span class="highlight">task_acks_late</span> can increase reliability for idempotent tasks.</li>
 </ul>
 </div>
 </section>
